@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "expressRouteCircuitId": {
+      "type": "String"
+    },
+    "expressRouteLocation": {
+      "type": "String"
+    },
+    "actionGroupName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2018-02-01",
+      "name": "pid-29362fa7-15c9-5061-8565-f82f26129ab8",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
+    {
+      "type": "microsoft.insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "BGP availability of ExpressRoute Circuit",
+      "location": "global",
+      "properties": {
+        "description": "This alert is trigerred when BGP availability of ExpressRoute Circuit is less than 98% for 5 or more minutes",
+        "severity": 2,
+        "enabled": true,
+        "scopes": [
+          "[parameters('expressRouteCircuitId')]"
+        ],
+        "evaluationFrequency": "PT5M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "allOf": [
+            {
+              "threshold": 98,
+              "name": "Metric1",
+              "metricNamespace": "microsoft.network/expressroutecircuits",
+              "metricName": "BgpAvailability",
+              "dimensions": [],
+              "operator": "LessThan",
+              "timeAggregation": "Average",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.Network/expressRouteCircuits",
+        "targetResourceRegion": "[parameters('expressRouteLocation')]",
+        "actions": [
+          {
+            "actionGroupId": "[variables('actionGroupId')]",
+            "webHookProperties": {}
+          }
+        ]
+      }
+    }
+  ]
+}
