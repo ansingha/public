@@ -1,0 +1,86 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "sku": {
+            "type": "string"
+        },
+        "subnetId": {
+            "type": "string"
+        },
+        "privateIPAllocationMethod": {
+            "type": "string"
+        },
+        "privateIPAddress": {
+            "type": "string"
+        },
+        "privateIPAddressVersion": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('name')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "dependsOn": [],
+            "tags": {},
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('privateIPAllocationMethod')]",
+                            "subnet": {
+                                "id": "[parameters('subnetId')]"
+                            },
+                            "privateIPAddress": "[parameters('privateIPAddress')]",
+                            "privateIPAddressVersion": "[parameters('privateIPAddressVersion')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+
+
+
+=================
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "uksouth"
+        },
+        "name": {
+            "value": "mim_lb"
+        },
+        "sku": {
+            "value": "Basic"
+        },
+        "subnetId": {
+            "value": "/subscriptions/68acce96-503b-4d2b-82d7-4b0b427b7187/resourceGroups/ag/providers/Microsoft.Network/virtualNetworks/vnet_ag/subnets/default"
+        },
+        "privateIPAllocationMethod": {
+            "value": "Static"
+        },
+        "privateIPAddress": {
+            "value": "10.2.0.10"
+        },
+        "privateIPAddressVersion": {
+            "value": "IPv4"
+        }
+    }
