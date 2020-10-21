@@ -2,85 +2,79 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "name": {
+        "storageAccountName": {
             "type": "string"
         },
         "location": {
             "type": "string"
-        },
-        "sku": {
-            "type": "string"
-        },
-        "subnetId": {
-            "type": "string"
-        },
-        "privateIPAllocationMethod": {
-            "type": "string"
-        },
-        "privateIPAddress": {
-            "type": "string"
-        },
-        "privateIPAddressVersion": {
-            "type": "string"
         }
     },
+    "variables": {
+        "accountType": "Standard_RAGRS",
+        "kind": "StorageV2",
+        "accessTier": "Hot",
+        "minimumTlsVersion": "TLS1_2",
+        "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false,
+        "networkAclsBypass": "AzureServices",
+        "networkAclsDefaultAction": "Allow",
+        "isHnsEnabled": true,
+        "cuaID": xxxxx
+
+    },
     "resources": [
+                {
+            "apiVersion": "2018-02-01",
+            "name": "[concat('pid-', variables('cuaID'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
         {
-            "apiVersion": "2020-05-01",
-            "name": "[parameters('name')]",
-            "type": "Microsoft.Network/loadBalancers",
+            "name": "[parameters('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
             "location": "[parameters('location')]",
-            "sku": {
-                "name": "[parameters('sku')]"
+            "properties": {
+                "accessTier": "[variables('accessTier')]",
+                "minimumTlsVersion": "[variables('minimumTlsVersion')]",
+                "supportsHttpsTrafficOnly": "[variables('supportsHttpsTrafficOnly')]",
+                "allowBlobPublicAccess": "[variables('allowBlobPublicAccess')]",
+                "networkAcls": {
+                    "bypass": "[variables('networkAclsBypass')]",
+                    "defaultAction": "[variables('networkAclsDefaultAction')]",
+                    "ipRules": []
+                },
+                "isHnsEnabled": "[variables('isHnsEnabled')]"
             },
             "dependsOn": [],
-            "tags": {},
-            "properties": {
-                "frontendIPConfigurations": [
-                    {
-                        "name": "LoadBalancerFrontEnd",
-                        "properties": {
-                            "privateIPAllocationMethod": "[parameters('privateIPAllocationMethod')]",
-                            "subnet": {
-                                "id": "[parameters('subnetId')]"
-                            },
-                            "privateIPAddress": "[parameters('privateIPAddress')]",
-                            "privateIPAddressVersion": "[parameters('privateIPAddressVersion')]"
-                        }
-                    }
-                ]
-            }
+            "sku": {
+                "name": "[variables('accountType')]"
+            },
+            "kind": "[variables('kind')]",
+            "tags": {}
         }
-    ]
+    ],
+    "outputs": {}
 }
 
-
-
-=================
+========================
 
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "storageAccountName": {
+            "value": "dlsvauksprod"
+        },
         "location": {
             "value": "uksouth"
-        },
-        "name": {
-            "value": "mim_lb"
-        },
-        "sku": {
-            "value": "Basic"
-        },
-        "subnetId": {
-            "value": "/subscriptions/68acce96-503b-4d2b-82d7-4b0b427b7187/resourceGroups/ag/providers/Microsoft.Network/virtualNetworks/vnet_ag/subnets/default"
-        },
-        "privateIPAllocationMethod": {
-            "value": "Static"
-        },
-        "privateIPAddress": {
-            "value": "10.2.0.10"
-        },
-        "privateIPAddressVersion": {
-            "value": "IPv4"
         }
     }
+}
